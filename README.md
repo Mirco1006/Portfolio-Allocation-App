@@ -7,10 +7,10 @@ This project is for educational purposes only and does not constitute investment
 This project is an interactive portfolio allocation and optimization application built in Python.
 It allows users to construct and analyze equity portfolios using classical portfolio theory and risk metrics, based on real market data.
 The goal of the project is to demonstrate practical skills in:
-- Portfolio construction,
-- risk-return analysis,
-- numerical optimization,
-- and financial data handling.
+- Portfolio construction
+- Risk-return analysis
+- Numerical optimization
+- Financial data handling
 
 ## Features
 
