@@ -80,7 +80,7 @@ def max_sharpe_ratio(mu: np.ndarray, cov: np.ndarray, rf: float = 0.0, max_weigh
 
 
 def efficient_frontier(mu, cov, n_points=30, long_only=True, max_weight: float | None = None):
-    """Return n points on the efficient frontier using the CAPM model"""
+    """Return n points on the efficient frontier using the efficient frontier"""
     mu = np.asarray(mu).flatten()
     cov = np.asarray(cov)
 
