@@ -1,8 +1,7 @@
 import numpy as np
 import streamlit as st
-from sklearn.covariance import LedoitWolf
 from src.data import download_data, load_sp500_table_requests
-from src.analytics import calculate_return, calculate_correlation
+from src.analytics import calculate_return, calculate_correlation, covariance_ledoit_wolf
 from src.optimization import equal_weight, min_variance_portfolio, max_sharpe_ratio, efficient_frontier
 from src.plotting import (
     plot_weights,

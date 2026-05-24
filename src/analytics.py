@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from sklearn.covariance import LedoitWolf
 
 #Define the number of trading days per year
 TRADING_DAYS = 252
@@ -31,3 +32,12 @@ def calculate_volatility(returns: pd.DataFrame, annualize: bool = True):
 def calculate_correlation(returns: pd.DataFrame):
     """Return the correlation between each stock"""
     return returns.corr()
+
+def covariance_ledoit_wolf(returns_df, annualization: int = 252) -> np.ndarray:
+    """Robust PSD covariance via Ledoit-Wolf shrinkage."""
+    clean = returns_df.dropna(how="any")
+    X = clean.values
+    lw = LedoitWolf().fit(X)
+    cov = lw.covariance_ * annualization
+    cov = 0.5 * (cov + cov.T)
+    return cov
