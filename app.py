@@ -12,6 +12,8 @@ from src.plotting import (
 )
 from src.risk import calculate_portfolio_vol, calculate_daily_returns, calculate_drawdown
 
+N_FRONTIER_POINTS = 60
+
 st.set_page_config(page_title="Portfolio Allocation & Optimization", layout="wide")
 
 def sidebar_inputs():
@@ -234,7 +236,7 @@ fig_corr = plot_correlation(correlations)
 fig_frontier = None
 if params["compute_frontier"]:
     try:
-        ef_v, ef_r, _ = efficient_frontier(mu, cov, 60)
+        ef_v, ef_r, _ = efficient_frontier(mu, cov, N_FRONTIER_POINTS)
         fig_frontier = plot_efficient_frontier(ef_v, ef_r)
     except Exception as e:
         st.warning("Efficient frontier could not be computed (covariance may be unstable or too many assets).")
