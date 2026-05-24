@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 
-TRADING_DAYS = 252
-
 def calculate_portfolio_vol(weights: np.ndarray, cov: np.ndarray):
     """Return the volatility of the portfolio during the period"""
     portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(cov, weights)))
