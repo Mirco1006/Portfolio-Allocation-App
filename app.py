@@ -10,7 +10,7 @@ from src.plotting import (
     plot_drawdown,
     plot_efficient_frontier,
 )
-from src.risk import calculate_portfolio_vol, calculate_daily_returns, calculate_drawdown
+from src.risk import calculate_portfolio_vol, calculate_daily_returns, calculate_drawdown, drawdown_series
 
 N_FRONTIER_POINTS = 60
 
@@ -216,7 +216,8 @@ with st.spinner("Downloading data and running optimisation..."):
     sharpe_ratio = (ann_return - params["rf"]) / ann_vol if ann_vol > 0 else np.nan
 
     # Drawdown
-    max_dd = calculate_drawdown(daily_returns)
+    dd_series = drawdown_series(daily_returns)
+    max_dd = dd_series.min()
 
 # --- KPI ---
 c1, c2, c3, c4 = st.columns(4)
@@ -229,7 +230,7 @@ st.divider()
 
 fig_weights = plot_weights(params["tickers"], weights)
 fig_perf = plot_portfolio_performance(daily_returns)
-fig_dd = plot_drawdown(daily_returns)
+fig_dd = plot_drawdown(dd_series)
 fig_corr = plot_correlation(correlations)
 
 fig_frontier = None

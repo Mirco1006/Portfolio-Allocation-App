@@ -13,10 +13,12 @@ def calculate_daily_returns(returns: pd.DataFrame, weights: np.ndarray) -> pd.Se
     w = np.asarray(weights).flatten()
     return returns.dot(w)
 
-
-def calculate_drawdown(daily_return: pd.Series) -> float:
-    """Return the maximum drawdown"""
-    wealth = (1 + daily_return).cumprod()
+def drawdown_series(daily_returns: pd.Series) -> pd.Series:
+    """Compute the full drawdown series (underwater curve)."""
+    wealth = (1 + daily_returns).cumprod()
     peak = wealth.cummax()
-    drawdown = (wealth - peak) / peak
-    return drawdown.min()
+    return (wealth - peak) / peak
+
+def calculate_drawdown(daily_returns: pd.Series) -> float:
+    """Return the maximum drawdown (single scalar)."""
+    return drawdown_series(daily_returns).min()

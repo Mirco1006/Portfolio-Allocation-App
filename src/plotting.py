@@ -44,12 +44,8 @@ def plot_portfolio_performance(daily_returns):
     fig.tight_layout()
     return fig
 
-def plot_drawdown(daily_returns):
-    """Return a plot with the maximum drawdown for each day during the period"""
-    wealth = (1 + daily_returns).cumprod()
-    peak = wealth.cummax()
-    dd = (wealth - peak) / peak
-
+def plot_drawdown(dd: pd.Series):
+    """Plot the underwater curve from a pre-computed drawdown series."""
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.plot(dd.index, dd.values)
     ax.set_title("Drawdown")
@@ -58,7 +54,6 @@ def plot_drawdown(daily_returns):
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1))
     ax.tick_params(axis="x", rotation=45)
 
-    # Annotation max drawdown
     mdd = dd.min()
     ax.axhline(mdd, linestyle="--")
     ax.text(dd.index[-1], mdd, f" Max DD: {mdd:.1%}", va="bottom", ha="right")
