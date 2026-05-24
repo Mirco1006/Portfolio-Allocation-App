@@ -13,6 +13,7 @@ from src.plotting import (
 from src.risk import calculate_portfolio_vol, calculate_daily_returns, calculate_drawdown, drawdown_series
 
 N_FRONTIER_POINTS = 60
+N_TRADING_DAYS = 252
 
 st.set_page_config(page_title="Portfolio Allocation & Optimization", layout="wide")
 
@@ -78,13 +79,6 @@ def sidebar_inputs():
         help="Simple returns are common for portfolio optimization. Log returns are sometimes used for modeling."
     )
 
-    annualization = st.sidebar.selectbox(
-        "Annualization factor",
-        options=[252, 52, 12],
-        index=0,
-        help="Use 252 for daily data, 52 for weekly, 12 for monthly."
-    )
-
     st.sidebar.divider()
 
     # --- Optimization settings ---
@@ -134,7 +128,6 @@ def sidebar_inputs():
         "tickers": tickers,
         "period": period,
         "return_type": return_type,
-        "annualization": annualization,
         "method": method,
         "rf": rf,
         "compute_frontier": compute_frontier,
@@ -185,10 +178,10 @@ with st.spinner("Downloading data and running optimisation..."):
     returns_clean = returns.dropna(how="any")
 
     # Mean returns (annualised)
-    mu = returns_clean.mean(axis=0).values * params["annualization"]  # (N,)
+    mu = returns_clean.mean(axis=0).values * N_TRADING_DAYS  # (N,)
 
     # Covariance (annualised)
-    cov = covariance_ledoit_wolf(returns_clean, annualization=params["annualization"])
+    cov = covariance_ledoit_wolf(returns_clean, annualization=N_TRADING_DAYS)
 
     # Correlation matrix for heatmap
     correlations = calculate_correlation(returns_clean)
@@ -211,8 +204,8 @@ with st.spinner("Downloading data and running optimisation..."):
     daily_returns = daily_returns.dropna() if hasattr(daily_returns, "dropna") else daily_returns
 
     # Annualised return + Sharpe
-    ann_return = float(np.mean(daily_returns) * params["annualization"])
-    ann_vol = float(np.std(daily_returns, ddof=1) * np.sqrt(params["annualization"]))
+    ann_return = float(np.mean(daily_returns) * N_TRADING_DAYS)
+    ann_vol = float(np.std(daily_returns, ddof=1) * np.sqrt(N_TRADING_DAYS))
     sharpe_ratio = (ann_return - params["rf"]) / ann_vol if ann_vol > 0 else np.nan
 
     # Drawdown
