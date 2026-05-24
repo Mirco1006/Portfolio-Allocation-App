@@ -144,7 +144,6 @@ def sidebar_inputs():
 
 params = sidebar_inputs()
 
-@st.cache_data(ttl=3600)
 def download_prices_cached(tickers, period):
     """Cache wrapper for prices download."""
     return download_data(list(tickers), period)
