@@ -13,11 +13,6 @@ def calculate_daily_returns(returns: pd.DataFrame, weights: np.ndarray) -> pd.Se
     w = np.asarray(weights).flatten()
     return returns.dot(w)
 
-def calculate_sharpe_ratio(daily_returns: pd.Series, rf: float=0.0) -> float:
-    """Return sharpe ratio of the portfolio"""
-    mu_ann = daily_returns.mean() * TRADING_DAYS
-    vol_ann = daily_returns.std() * np.sqrt(TRADING_DAYS)
-    return (mu_ann - rf) / vol_ann if vol_ann != 0 else np.nan
 
 def calculate_drawdown(daily_return: pd.Series) -> float:
     """Return the maximum drawdown"""
