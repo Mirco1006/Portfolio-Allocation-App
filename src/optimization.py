@@ -2,12 +2,41 @@ import numpy as np
 import cvxpy as cp
 
 def equal_weight(stocks):
-    """Return array with the stock weights using the equal weight method"""
+    """Compute equal-weight (1/N) allocation.
+
+    Parameters
+    ----------
+    stocks : list[str]
+        List of ticker symbols.
+
+    Returns
+    -------
+    np.ndarray
+        (N,) array where each weight equals 1/N.
+    """
     weights = np.full(len(stocks), 1/len(stocks))
     return weights
 
 def min_variance_portfolio(cov: np.ndarray, max_weight: float | None = None):
-    """Return array with the stock weights using the minimum variance method"""
+    """Solve the long-only minimum variance portfolio using CVXPY.
+
+    Parameters
+    ----------
+    cov : np.ndarray
+        Annualized N×N covariance matrix (must be symmetric PSD).
+    max_weight : float or None
+        Upper bound on each individual weight (e.g. 0.40). None = no cap.
+
+    Returns
+    -------
+    np.ndarray
+        (N,) optimal weight vector summing to 1.
+
+    Raises
+    ------
+    ValueError
+        If CVXPY finds no feasible solution.
+    """
     cov = np.asarray(cov)
 
     # Safety: enforce symmetry (helps numerical stability)
@@ -43,7 +72,32 @@ def min_variance_portfolio(cov: np.ndarray, max_weight: float | None = None):
 
 
 def max_sharpe_ratio(mu: np.ndarray, cov: np.ndarray, rf: float = 0.0, max_weight: float | None = None):
-    """Return array with the stock weights using the maximum sharpe ratio method"""
+    """Solve the long-only maximum Sharpe ratio portfolio using CVXPY.
+
+    Uses the convex reformulation: maximize excess return subject to
+    quadratic risk constraint, then normalize weights to sum to 1.
+
+    Parameters
+    ----------
+    mu : np.ndarray
+        (N,) annualized expected return vector.
+    cov : np.ndarray
+        Annualized N×N covariance matrix (symmetric PSD).
+    rf : float
+        Annual risk-free rate (e.g. 0.02 for 2%).
+    max_weight : float or None
+        Upper bound per asset. None = no cap.
+
+    Returns
+    -------
+    np.ndarray
+        (N,) optimal weight vector summing to 1.
+
+    Raises
+    ------
+    ValueError
+        If CVXPY finds no feasible solution.
+    """
     mu = np.asarray(mu).flatten()
     cov = np.asarray(cov)
 
@@ -80,7 +134,33 @@ def max_sharpe_ratio(mu: np.ndarray, cov: np.ndarray, rf: float = 0.0, max_weigh
 
 
 def efficient_frontier(mu, cov, n_points=30, long_only=True, max_weight: float | None = None):
-    """Return n points on the efficient frontier using the efficient frontier"""
+    """Compute points on the mean-variance efficient frontier.
+
+    For each target return between min(mu) and max(mu), solves a
+    minimum-variance problem with a return floor constraint.
+
+    Parameters
+    ----------
+    mu : np.ndarray
+        (N,) annualized expected return vector.
+    cov : np.ndarray
+        Annualized N×N covariance matrix (symmetric PSD).
+    n_points : int
+        Number of points to compute on the frontier.
+    long_only : bool
+        If True, enforce w >= 0 constraint.
+    max_weight : float or None
+        Upper bound per asset. None = no cap.
+
+    Returns
+    -------
+    vols : np.ndarray
+        Annualized volatilities for each frontier point.
+    rets : np.ndarray
+        Annualized returns for each frontier point.
+    weights_list : list[np.ndarray]
+        Optimal weight vectors for each point.
+    """
     mu = np.asarray(mu).flatten()
     cov = np.asarray(cov)
 
