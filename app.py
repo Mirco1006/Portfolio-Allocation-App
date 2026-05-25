@@ -18,7 +18,14 @@ N_TRADING_DAYS = 252
 st.set_page_config(page_title="Portfolio Allocation & Optimization", layout="wide")
 
 def sidebar_inputs():
-    """Sidebar inputs for the Portfolio Allocation & Optimization App."""
+    """Render the Streamlit sidebar and collect user parameters.
+
+    Returns
+    -------
+    dict
+        Keys: 'tickers', 'period', 'return_type', 'annualization',
+        'method', 'rf', 'compute_frontier', 'max_weight', 'run'.
+    """
 
     st.sidebar.header("Portfolio Settings")
 
