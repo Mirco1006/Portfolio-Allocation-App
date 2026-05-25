@@ -5,12 +5,20 @@ import requests
 
 @st.cache_data
 def download_data(tickers, period="1y"):
-    '''
-    Function that download the close price from yfinance
-    :param tickers: List of ticker for which we want to download data
-    :param period: The period of time to download the data (by default 1 year)
-    :return:
-    '''
+    """Download adjusted close prices from Yahoo Finance via yfinance.
+
+    Parameters
+    ----------
+    tickers : list[str] or str
+        Ticker symbol(s) to download (e.g. ['AAPL', 'MSFT']).
+    period : str
+        Lookback period accepted by yfinance ('1y', '3y', '5y').
+
+    Returns
+    -------
+    pd.DataFrame
+        Adjusted close prices (index=dates, columns=tickers).
+    """
     if isinstance(tickers, str):
         tickers = [tickers]
     #We download the data from yfinance
@@ -53,20 +61,20 @@ def load_sp500_table_requests() -> pd.DataFrame:
         )
     }
 
-    # 1) Téléchargement HTML
+    # Download HTML page
     response = requests.get(url, headers=headers, timeout=15)
     response.raise_for_status()  # lève une erreur si HTTP 4xx/5xx
 
     html = response.text
 
-    # 2) Extraction du tableau principal via read_html
+    # Parse the main constituents table
     tables = pd.read_html(html)
     if len(tables) == 0:
         raise ValueError("No tables found on the Wikipedia page.")
 
     df = tables[0].copy()  # le premier tableau = constituents
 
-    # 3) Normalisation du ticker Yahoo Finance
+    # Normalize ticker for Yahoo Finance (BRK.B -> BRK-B)
     df["YahooSymbol"] = df["Symbol"].astype(str).str.replace(".", "-", regex=False)
 
     return df
