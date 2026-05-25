@@ -3,7 +3,19 @@ from matplotlib.ticker import FuncFormatter
 import matplotlib.ticker as mtick
 
 def plot_weights(stocks, weights):
-    """Return barplot with the stock weights"""
+    """Plot a bar chart of portfolio allocation weights.
+
+    Parameters
+    ----------
+    stocks : list[str]
+        Ticker symbols for the x-axis labels.
+    weights : np.ndarray
+        (N,) weight vector.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+    """
     fig, ax =  plt.subplots(figsize=(6, 4))
     ax.bar(stocks, weights)
     ax.set_title("Portfolio weights")
@@ -13,10 +25,20 @@ def plot_weights(stocks, weights):
     fig.tight_layout()
     return fig
 
-def plot_correlation(correlations):
-    """Return plot with the stock correlations"""
+def plot_correlation(correlations: pd.DataFrame):
+    """Plot a heatmap of the pairwise asset correlation matrix.
+
+    Parameters
+    ----------
+    correlations : pd.DataFrame
+        N×N correlation matrix (values between -1 and 1).
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+    """
     fig, ax = plt.subplots(figsize=(6, 5))
-    im = ax.imshow(correlations.values, vmin=-1, vmax=1)
+    im = ax.imshow(correlations.values, vmin=-1, vmax=1, cmap="RdBu_r")
     ax.set_title("Correlation matrix")
 
     ax.set_xticks(range(len(correlations.columns)))
@@ -24,16 +46,31 @@ def plot_correlation(correlations):
     ax.set_xticklabels(correlations.columns, rotation=45, ha="right")
     ax.set_yticklabels(correlations.index)
 
+    # Display correlation values in each cell
+    for i in range(len(correlations.index)):
+        for j in range(len(correlations.columns)):
+            val = correlations.values[i, j]
+            color = "white" if abs(val) > 0.6 else "black"
+            ax.text(j, i, f"{val:.2f}", ha="center", va="center", color=color, fontsize=7)
+
     cbar = fig.colorbar(im, ax=ax)
     cbar.set_label("Correlation")
-    cbar.formatter = FuncFormatter(lambda x, pos: f"{x*100:.0f}%")
-    cbar.update_ticks()
 
     fig.tight_layout()
     return fig
 
 def plot_portfolio_performance(daily_returns):
-    """Return a plot with the portfolio performance over the period"""
+    """Plot the cumulative wealth index (base 1.0) of the portfolio.
+
+    Parameters
+    ----------
+    daily_returns : pd.Series
+        Daily portfolio returns.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+    """
     wealth = (1 + daily_returns).cumprod()
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.plot(wealth.index, wealth.values)
@@ -45,7 +82,17 @@ def plot_portfolio_performance(daily_returns):
     return fig
 
 def plot_drawdown(dd: pd.Series):
-    """Plot the underwater curve from a pre-computed drawdown series."""
+    """Plot the underwater (drawdown) curve with max drawdown annotation.
+
+    Parameters
+    ----------
+    dd : pd.Series
+        Pre-computed drawdown series (values <= 0).
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+    """
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.plot(dd.index, dd.values)
     ax.set_title("Drawdown")
@@ -62,7 +109,19 @@ def plot_drawdown(dd: pd.Series):
     return fig
 
 def plot_efficient_frontier(efficient_frontier_vol, efficient_frontier_ret):
-    """Return a plot with the points on the efficient frontier"""
+    """Plot the mean-variance efficient frontier.
+
+    Parameters
+    ----------
+    efficient_frontier_vol : np.ndarray
+        Annualized volatilities for each frontier point.
+    efficient_frontier_ret : np.ndarray
+        Annualized returns for each frontier point.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+    """
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.plot(efficient_frontier_vol, efficient_frontier_ret, marker="o", linewidth=1)
     ax.set_title("Efficient Frontier")
